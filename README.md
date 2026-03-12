@@ -34,4 +34,4 @@ Simplemente abrí el archivo `index.html` en el navegador. No requiere instalaci
 
 ## Enlace al repositorio
 
-> Agregar enlace al repositorio público de GitHub aquí.
+> (https://github.com/javier-vh9519/weather-frontend-m6.git)
