@@ -1,0 +1,30 @@
+﻿$font-base: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+$color-bg: #f3f7fb;
+$color-surface: #ffffff;
+$color-text: #10233a;
+$color-text-muted: #4f6076;
+$color-primary: #0d4b8f;
+$color-primary-dark: #08325f;
+$color-border: #dce6f2;
+
+$space-1: 0.25rem;
+$space-2: 0.5rem;
+$space-3: 0.75rem;
+$space-4: 1rem;
+$space-5: 1.5rem;
+$space-6: 2rem;
+
+$radius-md: 0.75rem;
+$radius-lg: 1rem;
+
+$shadow-card: 0 8px 24px rgba(10, 40, 75, 0.08);
+
+$bp-mobile-max: 420px;
+$bp-desktop-min: 1024px;
+
+@mixin card-elevation {
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+}

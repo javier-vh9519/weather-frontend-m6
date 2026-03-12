@@ -1,0 +1,25 @@
+@use "../base/variables" as *;
+
+.weather-footer {
+  background: #101820;
+  color: #d7dfeb;
+}
+
+.weather-footer__title {
+  font-size: 2rem;
+  padding-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #d7dfeb;
+}
+
+.weather-footer__link {
+  color: #d7dfeb;
+  text-decoration: none;
+}
+
+.weather-footer__link:hover,
+.weather-footer__link:focus {
+  color: #ffffff;
+  text-decoration: underline;
+}
+

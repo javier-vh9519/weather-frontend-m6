@@ -1,0 +1,53 @@
+@use "../base/variables" as *;
+
+.weather-app__header {
+  background-image: linear-gradient(rgba(9, 37, 70, 0.45), rgba(9, 37, 70, 0.45)), url("../img/Antofagasta-832-2048x1024.webp");
+  background-size: cover;
+  background-position: center;
+}
+
+.weather-app__main {
+  min-height: 60vh;
+}
+
+.weather-app__content--alt {
+  border-top: 1px solid $color-border;
+}
+
+.weather-panel {
+  @include card-elevation;
+  background: $color-surface;
+  padding: $space-4;
+  height: 100%;
+}
+
+.weather-panel__title {
+  margin-bottom: $space-4;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.weather-panel__map {
+  width: 100%;
+  min-height: 280px;
+  border: 0;
+  border-radius: $radius-md;
+}
+
+@media (max-width: $bp-mobile-max) {
+  .weather-app__header .display-5 {
+    font-size: 1.6rem;
+  }
+
+  .weather-panel {
+    padding: $space-3;
+  }
+}
+
+@media (min-width: $bp-desktop-min) {
+  .weather-app__content {
+    padding-top: $space-6;
+    padding-bottom: $space-6;
+  }
+}
+

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>App de Clima — Módulo 6 (Vue.js)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; }
+
+    .weather-nav { background: #1e293b; border-bottom: 1px solid #334155; padding: 0.75rem 0; }
+    .weather-nav a { color: #e2e8f0; text-decoration: none; font-weight: 700; font-size: 1.2rem; }
+    .weather-nav .nav-link { color: #94a3b8; font-size: 0.9rem; cursor: pointer; }
+    .weather-nav .nav-link:hover, .weather-nav .nav-link.active { color: #0ea5e9; }
+
+    .weather-header {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #1e3a5f 100%);
+      padding: 2rem 0; text-align: center;
+    }
+    .weather-header h1 { color: #fff; font-size: 1.6rem; font-weight: 700; margin: 0; }
+    .weather-header p { color: rgba(255,255,255,0.7); margin: 4px 0 0; font-size: 0.9rem; }
+
+    .weather-footer { background: #1e293b; border-top: 1px solid #334155; padding: 1.5rem 0; text-align: center; color: #64748b; font-size: 0.85rem; }
+
+    .place-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+    .place-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(14,165,233,0.2); }
+    .place-card img { width: 100%; height: 180px; object-fit: cover; }
+    .place-card__body { padding: 1rem; }
+    .place-card__name { color: #f1f5f9; font-weight: 700; margin-bottom: 4px; }
+    .place-card__desc { color: #94a3b8; font-size: 0.85rem; margin-bottom: 8px; }
+    .place-card__temp { color: #0ea5e9; font-weight: 600; font-size: 0.95rem; }
+
+    .weather-panel { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1.25rem; }
+    .weather-panel__title { color: #0ea5e9; font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem; }
+
+    .list-group-item { background: #0f172a; color: #e2e8f0; border-color: #334155; font-size: 0.88rem; }
+
+    .btn-weather { background: #0ea5e9; color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1.2rem; font-weight: 600; cursor: pointer; transition: background 0.2s; display: inline-block; text-align: center; width: 100%; }
+    .btn-weather:hover { background: #38bdf8; }
+    .btn-back { background: #334155; color: #e2e8f0; border: none; border-radius: 8px; padding: 0.5rem 1.2rem; font-weight: 600; cursor: pointer; margin-bottom: 1.5rem; }
+    .btn-back:hover { background: #475569; }
+
+    .alert-info-dark { background: #0c4a6e; color: #bae6fd; border: 1px solid #0ea5e9; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem; }
+    .alert-danger-dark { background: #450a0a; color: #fca5a5; border: 1px solid #dc2626; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem; }
+
+    .form-control, .form-select { background: #0f172a !important; color: #e2e8f0 !important; border-color: #334155 !important; }
+    .form-control:focus, .form-select:focus { border-color: #0ea5e9 !important; box-shadow: 0 0 0 2px rgba(14,165,233,0.2) !important; }
+    .form-label { color: #94a3b8; font-size: 0.85rem; }
+
+    .detalle-img { width: 100%; max-width: 340px; height: 220px; object-fit: cover; border-radius: 12px; }
+
+    [v-cloak] { display: none; }
+  </style>
+</head>
+<body>
+<div id="app" v-cloak>
+
+  <!-- NAVBAR -->
+  <nav class="weather-nav">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a @click="irHome" style="cursor:pointer;">🌤️ Weather App</a>
+      <div class="d-flex gap-4 align-items-center">
+        <span class="nav-link" :class="{active: vista==='home'}" @click="irHome">Home</span>
+        <span class="text-white-50 small">{{ horaActual }}</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
+  <header class="weather-header">
+    <div class="container">
+      <h1>Módulo 6: App de Clima (SPA con Vue.js)</h1>
+      <p>{{ fechaActual }}</p>
+    </div>
+  </header>
+
+  <main style="min-height:60vh; padding: 2rem 0;">
+    <div class="container">
+
+      <!-- ======= VISTA HOME ======= -->
+      <div v-if="vista === 'home'">
+        <div class="row g-3 mb-4 align-items-end">
+          <div class="col-md-6">
+            <label class="form-label">🔍 Buscar lugar</label>
+            <input v-model="busqueda" type="text" class="form-control" placeholder="Ej: Calama, Taltal..." />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">🌡️ Unidad</label>
+            <select v-model="unidad" class="form-select">
+              <option value="C">Celsius (°C)</option>
+              <option value="F">Fahrenheit (°F)</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label d-block">&nbsp;</label>
+            <button class="btn-weather" @click="recargarLugares">🔄 Recargar clima</button>
+          </div>
+        </div>
+
+        <div v-if="estadoHome === 'cargando'" class="alert-info-dark">⏳ Cargando datos desde la API...</div>
+        <div v-if="estadoHome === 'error'" class="alert-danger-dark">❌ {{ errorHome }}</div>
+        <div v-if="estadoHome === 'listo' && lugaresFiltrados.length === 0" class="alert-info-dark">
+          No se encontraron lugares con "{{ busqueda }}".
+        </div>
+
+        <div v-if="estadoHome === 'listo'" class="row g-4">
+          <div v-for="lugar in lugaresFiltrados" :key="lugar.id" class="col-12 col-md-6 col-lg-4">
+            <div class="place-card h-100 d-flex flex-column">
+              <img :src="lugar.imagen" :alt="lugar.nombre" />
+              <div class="place-card__body d-flex flex-column flex-grow-1">
+                <h3 class="place-card__name">{{ lugar.nombre }}</h3>
+                <p class="place-card__desc">{{ lugar.descripcion }}</p>
+                <p class="place-card__temp mt-auto">🌡️ {{ convertirTemp(lugar.tempActual) }} — {{ lugar.estadoActual }}</p>
+                <button class="btn-weather mt-2" @click="irDetalle(lugar.id)">Ver detalle</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= VISTA DETALLE ======= -->
+      <div v-if="vista === 'detalle'">
+        <button class="btn-back" @click="irHome">← Volver al Home</button>
+
+        <div v-if="estadoDetalle === 'cargando'" class="alert-info-dark">⏳ Cargando detalle...</div>
+        <div v-if="estadoDetalle === 'error'" class="alert-danger-dark">❌ {{ errorDetalle }}</div>
+
+        <div v-if="estadoDetalle === 'listo' && lugarDetalle">
+          <div class="place-card d-flex flex-column flex-md-row overflow-hidden mb-4">
+            <img :src="lugarDetalle.imagen" :alt="lugarDetalle.nombre" class="detalle-img" />
+            <div class="p-4">
+              <h2 class="place-card__name fs-3">{{ lugarDetalle.nombre }}</h2>
+              <p class="place-card__desc">{{ lugarDetalle.descripcion }}</p>
+              <p class="place-card__temp fs-5">🌡️ {{ convertirTemp(lugarDetalle.tempActual) }} — {{ lugarDetalle.estadoActual }}</p>
+              <div class="mt-3">
+                <label class="form-label">Unidad de temperatura</label>
+                <select v-model="unidad" class="form-select" style="max-width:200px;">
+                  <option value="C">Celsius (°C)</option>
+                  <option value="F">Fahrenheit (°F)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-12 col-lg-6">
+              <div class="weather-panel h-100">
+                <div class="weather-panel__title">📅 Pronóstico diario (semana)</div>
+                <ul class="list-group">
+                  <li v-for="dia in lugarDetalle.pronosticoSemanal" :key="dia.fechaIso"
+                      class="list-group-item d-flex justify-content-between flex-wrap gap-1">
+                    <span>{{ dia.dia }}</span>
+                    <span>{{ convertirTemp(dia.min) }} / {{ convertirTemp(dia.max) }} — {{ dia.estado }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+              <div class="weather-panel h-100">
+                <div class="weather-panel__title">📊 Estadísticas de la semana</div>
+                <ul class="list-group mb-3">
+                  <li class="list-group-item d-flex justify-content-between">
+                    <span>Temperatura mínima</span><strong>{{ convertirTemp(Number(estadisticas.tempMinima)) }}</strong>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between">
+                    <span>Temperatura máxima</span><strong>{{ convertirTemp(Number(estadisticas.tempMaxima)) }}</strong>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between">
+                    <span>Temperatura promedio</span><strong>{{ convertirTemp(Number(estadisticas.tempPromedio)) }}</strong>
+                  </li>
+                </ul>
+                <div class="weather-panel__title">☁️ Días por tipo de clima</div>
+                <ul class="list-group mb-3">
+                  <li v-for="(cant, est) in estadisticas.diasPorEstado" :key="est"
+                      class="list-group-item d-flex justify-content-between">
+                    <span>{{ est }}</span><span>{{ cant }} día{{ cant > 1 ? 's' : '' }}</span>
+                  </li>
+                </ul>
+                <p class="mb-0" style="color:#0ea5e9; font-weight:600;">
+                  Condición predominante: <strong>{{ estadoDominante }}</strong>
+                </p>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="weather-panel">
+                <div class="weather-panel__title">🚨 Alertas de clima</div>
+                <ul class="list-group">
+                  <li v-for="alerta in alertas" :key="alerta" class="list-group-item">{{ alerta }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="weather-footer">© 2026 Bootcamp FrontEnd Javascript — Módulo 6</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@3.4.0/dist/vue.global.prod.js"></script>
+<script>
+const { createApp } = Vue
+
+const LUGARES_BASE = [
+  { id:1, nombre:'Antofagasta',          lat:-23.6509, lon:-70.3975, imagen:'https://picsum.photos/600/320?random=11', descripcion:'Capital regional con clima costero templado.' },
+  { id:2, nombre:'Calama',               lat:-22.4567, lon:-68.9237, imagen:'https://picsum.photos/600/320?random=21', descripcion:'Ciudad del desierto con gran amplitud térmica.' },
+  { id:3, nombre:'Tocopilla',            lat:-22.091,  lon:-70.1979, imagen:'https://picsum.photos/600/320?random=22', descripcion:'Localidad costera con nubosidad y llovizna ocasional.' },
+  { id:4, nombre:'Mejillones',           lat:-23.1,    lon:-70.45,   imagen:'https://picsum.photos/600/320?random=23', descripcion:'Puerto industrial con viento costero frecuente.' },
+  { id:5, nombre:'Taltal',               lat:-25.4011, lon:-70.4836, imagen:'https://picsum.photos/600/320?random=24', descripcion:'Comuna costera con niebla y temperaturas suaves.' },
+  { id:6, nombre:'San Pedro de Atacama', lat:-22.9111, lon:-68.2011, imagen:'https://picsum.photos/600/320?random=25', descripcion:'Destino altiplánico con días secos y noches frías.' }
+]
+
+const CODIGOS = {0:'Despejado',1:'Mayormente despejado',2:'Parcialmente nublado',3:'Nublado',45:'Niebla',48:'Niebla escarchada',51:'Llovizna',53:'Llovizna moderada',55:'Llovizna intensa',61:'Lluvia',63:'Lluvia moderada',65:'Lluvia intensa',71:'Nieve',73:'Nieve moderada',75:'Nieve intensa',80:'Chubascos',81:'Chubascos moderados',82:'Chubascos intensos',95:'Tormenta',96:'Tormenta con granizo',99:'Tormenta fuerte con granizo'}
+
+function traducir(c) { return CODIGOS[c] || 'Variable' }
+
+async function fetchClima(lat, lon) {
+  const p = new URLSearchParams({ latitude: lat, longitude: lon, timezone: 'America/Santiago', current: 'temperature_2m,weather_code', daily: 'weather_code,temperature_2m_max,temperature_2m_min' })
+  const r = await fetch(`https://api.open-meteo.com/v1/forecast?${p}`)
+  if (!r.ok) throw new Error(`Error API (${r.status})`)
+  return r.json()
+}
+
+function mapear(base, d) {
+  const DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']
+  return { ...base, tempActual: d.current.temperature_2m, estadoActual: traducir(d.current.weather_code),
+    pronosticoSemanal: d.daily.time.map((f,i) => ({ fechaIso:f, dia: DIAS[new Date(f+'T00:00:00').getDay()], min: d.daily.temperature_2m_min[i], max: d.daily.temperature_2m_max[i], estado: traducir(d.daily.weather_code[i]) }))
+  }
+}
+
+function calcStats(p) {
+  const diasPorEstado = p.reduce((a,d) => { a[d.estado]=(a[d.estado]||0)+1; return a }, {})
+  return { tempMinima: Math.min(...p.map(d=>d.min)).toFixed(1), tempMaxima: Math.max(...p.map(d=>d.max)).toFixed(1), tempPromedio: (p.map(d=>(d.min+d.max)/2).reduce((a,b)=>a+b,0)/p.length).toFixed(1), diasPorEstado }
+}
+
+function calcAlertas(p, s) {
+  const a = []
+  if (s.tempPromedio > 30) a.push('⚠️ Alerta de calor: promedio semanal mayor a 30°C.')
+  if (s.tempMinima < 5) a.push('🥶 Alerta de frío: mínimas por debajo de 5°C.')
+  if (p.filter(d=>/lluvia|chubascos|tormenta|llovizna/i.test(d.estado)).length >= 2) a.push('🌧️ Semana lluviosa: 2 o más días de lluvia.')
+  if (!a.length) a.push('✅ Sin alertas relevantes para esta semana.')
+  return a
+}
+
+let cache = null
+
+createApp({
+  data() {
+    return { vista:'home', horaActual:'', fechaActual:'', busqueda:'', unidad:'C', lugares:[], estadoHome:'cargando', errorHome:'', lugarDetalle:null, estadisticas:null, alertas:[], estadoDetalle:'cargando', errorDetalle:'' }
+  },
+  computed: {
+    lugaresFiltrados() { const t=this.busqueda.trim().toLowerCase(); return t ? this.lugares.filter(l=>l.nombre.toLowerCase().includes(t)) : this.lugares },
+    estadoDominante() { if (!this.estadisticas) return ''; return Object.entries(this.estadisticas.diasPorEstado).sort((a,b)=>b[1]-a[1])[0]?.[0]||'Variable' }
+  },
+  async mounted() {
+    this.tick(); setInterval(()=>this.tick(), 1000)
+    await this.cargarLugares()
+  },
+  methods: {
+    tick() {
+      const n=new Date(); this.horaActual=n.toLocaleTimeString('es-CL')
+      const dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'], meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+      this.fechaActual=`${dias[n.getDay()]} ${n.getDate()} de ${meses[n.getMonth()]} de ${n.getFullYear()}`
+    },
+    async cargarLugares(forzar=false) {
+      if (cache && !forzar) { this.lugares=cache; this.estadoHome='listo'; return }
+      this.estadoHome='cargando'
+      try {
+        const r = await Promise.all(LUGARES_BASE.map(async b => mapear(b, await fetchClima(b.lat, b.lon))))
+        cache=r; this.lugares=r; this.estadoHome='listo'
+      } catch(e) { this.errorHome=e.message; this.estadoHome='error' }
+    },
+    recargarLugares() { cache=null; this.cargarLugares(true) },
+    async irDetalle(id) {
+      this.vista='detalle'; this.estadoDetalle='cargando'
+      const base=LUGARES_BASE.find(l=>l.id===id)
+      if (!base) { this.errorDetalle='Lugar no encontrado.'; this.estadoDetalle='error'; return }
+      try {
+        this.lugarDetalle=mapear(base, await fetchClima(base.lat, base.lon))
+        this.estadisticas=calcStats(this.lugarDetalle.pronosticoSemanal)
+        this.alertas=calcAlertas(this.lugarDetalle.pronosticoSemanal, this.estadisticas)
+        this.estadoDetalle='listo'
+      } catch(e) { this.errorDetalle=e.message; this.estadoDetalle='error' }
+    },
+    irHome() { this.vista='home' },
+    convertirTemp(t) { return this.unidad==='F' ? `${((t*9/5)+32).toFixed(1)}°F` : `${Number(t).toFixed(1)}°C` }
+  }
+}).mount('#app')
+</script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f3f7fb;
+  color: #10233a;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.weather-app__header {
+  background-image: linear-gradient(rgba(9, 37, 70, 0.45), rgba(9, 37, 70, 0.45)), url("../img/Antofagasta-832-2048x1024.webp");
+  background-size: cover;
+  background-position: center;
+}
+
+.weather-app__main {
+  min-height: 60vh;
+}
+
+.weather-app__content--alt {
+  border-top: 1px solid #dce6f2;
+}
+
+.weather-panel {
+  border: 1px solid #dce6f2;
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(10, 40, 75, 0.08);
+  background: #ffffff;
+  padding: 1rem;
+  height: 100%;
+}
+
+.weather-panel__title {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.weather-panel__map {
+  width: 100%;
+  min-height: 280px;
+  border: 0;
+  border-radius: 0.75rem;
+}
+
+@media (max-width: 420px) {
+  .weather-app__header .display-5 {
+    font-size: 1.6rem;
+  }
+  .weather-panel {
+    padding: 0.75rem;
+  }
+}
+@media (min-width: 1024px) {
+  .weather-app__content {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+}
+.weather-nav {
+  background: #0d4b8f;
+}
+
+.weather-nav__brand {
+  font-weight: 700;
+}
+
+.weather-nav__link {
+  color: #e8f1fb;
+}
+
+.weather-nav__link:hover,
+.weather-nav__link:focus {
+  color: #ffffff;
+}
+
+.weather-nav .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.65);
+}
+
+.weather-nav .navbar-toggler:focus {
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+}
+
+.weather-nav .navbar-toggler-icon {
+  background-image: url('data:image/svg+xml,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"%3e%3cpath stroke="rgba%28255,255,255,0.95%29" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"/%3e%3c/svg%3e');
+}
+
+.place-card {
+  border: 1px solid #dce6f2;
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(10, 40, 75, 0.08);
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.place-card:hover {
+  transform: translateY(-3px);
+}
+
+.place-card__image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.place-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.place-card__name {
+  font-size: 1.1rem;
+  margin-bottom: 0;
+}
+
+.place-card__meta,
+.place-card__status {
+  color: #4f6076;
+  margin-bottom: 0;
+}
+
+.place-card__temp {
+  margin-bottom: 0;
+  color: #08325f;
+}
+
+.place-card__action {
+  align-self: flex-start;
+}
+
+.place-card--feature .place-card__image {
+  height: 260px;
+}
+
+@media (max-width: 420px) {
+  .place-card__image,
+  .place-card--feature .place-card__image {
+    height: 160px;
+  }
+}
+@media (min-width: 1024px) {
+  .place-card__image {
+    height: 170px;
+  }
+  .place-card--feature .place-card__image {
+    height: 320px;
+  }
+}
+.weather-footer {
+  background: #101820;
+  color: #d7dfeb;
+}
+
+.weather-footer__title {
+  font-size: 2rem;
+  padding-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #d7dfeb;
+}
+
+.weather-footer__link {
+  color: #d7dfeb;
+  text-decoration: none;
+}
+
+.weather-footer__link:hover,
+.weather-footer__link:focus {
+  color: #ffffff;
+  text-decoration: underline;
+}
